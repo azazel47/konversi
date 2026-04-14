@@ -36,7 +36,7 @@ def process_coordinates(image_input):
     1. Output HARUS tabel Markdown saja
     2. Kolom: id | bujur_derajat | bujur_menit | bujur_detik | BT_BB | lintang_derajat | lintang_menit | lintang_detik | LU_LS
     3. Jangan beri penjelasan apapun di luar tabel
-    4. Gunakan titik (.) sebagai desimal
+    4. Gunakan koma (,) sebagai desimal
     5. BT_BB hanya: BT atau BB. LU_LS hanya: LU atau LS.
     """
 
