@@ -80,7 +80,7 @@ if image:
             st.dataframe(df, use_container_width=True)
 
             st.markdown("### 📋 Copy ke Excel")
-            st.code(df.to_csv(sep=\"\\t\", index=False))
+            st.code(df.to_csv(sep="\t", index=False))
 
         except:
             st.warning("⚠️ Gagal parsing tabel, cek format output AI")
