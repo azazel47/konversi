@@ -97,7 +97,7 @@ if image_to_process:
     if st.button("🚀 Proses dengan AI", use_container_width=True):
         with st.spinner("🤖 AI sedang membaca tabel..."):
             try:
-                #hasil_raw = process_coordinates(image_to_process)
+                hasil_raw = process_coordinates(image_to_process)
                 #st.markdown("### 📋 Hasil AI")
                 #st.markdown(hasil_raw)
 
