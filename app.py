@@ -13,12 +13,30 @@ genai.configure(api_key="AIzaSyAI2CXCmxwKqHcT2HpRJ_vWbue_iKEZ8Yw")
 
 # ================= GEMINI =================
 def process_coordinates(image_input):
-    # Tambahkan awalan 'models/' untuk memastikan API mengenalinya
-    try:
-        model = genai.GenerativeModel('models/gemini-1.5-flash')
-    except:
-        # Fallback ke pro jika flash tetap tidak ditemukan
-        model = genai.GenerativeModel('models/gemini-1.5-pro')
+    # Daftar model yang akan dicoba urut dari yang paling efisien
+    model_names = [
+        'gemini-1.5-flash', 
+        'models/gemini-1.5-flash', 
+        'gemini-1.5-pro',
+        'models/gemini-1.5-flash-latest'
+    ]
+    
+    model = None
+    last_error = ""
+
+    for name in model_names:
+        try:
+            model = genai.GenerativeModel(name)
+            # Tes singkat apakah model bisa merespon
+            test_response = model.generate_content("test", generation_config={"max_output_tokens": 1})
+            if test_response:
+                break
+        except Exception as e:
+            last_error = str(e)
+            continue
+    
+    if model is None:
+        raise Exception(f"Semua model gagal dimuat. Error terakhir: {last_error}")
 
     prompt = """
     Anda adalah sistem ekstraksi data koordinat dari tabel.
