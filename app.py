@@ -8,7 +8,7 @@ from streamlit_paste_button import paste_image_button
 st.set_page_config(page_title="Konversi Koordinat AI", layout="wide")
 
 # 🔑 API KEY
-genai.configure(api_key="AIzaSyAI2CXCmxwKqHcT2HpRJ_vWbue_iKEZ8Yw")
+genai.configure(api_key="AIzaSyAjYw5qHC-pzoQqaxShZkVnmv6A-iafvdI")
 
 # ================= GEMINI =================
 def process_coordinates(image_input):
