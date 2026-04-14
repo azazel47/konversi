@@ -28,7 +28,7 @@ def process_coordinates_groq(image_input):
     # Menggunakan Llama 3.2 Vision 11B (Gratis & Cepat di Groq)
     try:
         completion = client.chat.completions.create(
-            model="llama-3.2-11b-vision-pixtral", 
+            model="llama-3.1-8b-instant", 
             messages=[
                 {
                     "role": "user",
