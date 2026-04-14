@@ -12,7 +12,7 @@ st.set_page_config(page_title="Konversi Koordinat (OpenAI)", layout="wide")
 # 🔑 API KEY OPENAI
 # Dapatkan di https://platform.openai.com/api-keys
 # Disarankan menggunakan st.secrets["OPENAI_API_KEY"] untuk deploy
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
