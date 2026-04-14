@@ -11,7 +11,7 @@ st.set_page_config(page_title="Konversi Koordinat (DeepSeek)", layout="wide")
 
 # 🔑 API KEY DEEPSEEK
 # Sebaiknya gunakan st.secrets["DEEPSEEK_API_KEY"] jika di deploy
-DEEPSEEK_API_KEY = "ISI_DENGAN_API_KEY_DEEPSEEK_ANDA"
+DEEPSEEK_API_KEY = "sk-248f95011d424e16965cf22091a96d6a"
 
 client = OpenAI(
     api_key=DEEPSEEK_API_KEY,
