@@ -98,13 +98,13 @@ if image_to_process:
         with st.spinner("🤖 AI sedang membaca tabel..."):
             try:
                 hasil_raw = process_coordinates(image_to_process)
-                #st.markdown("### 📋 Hasil AI")
-                #st.markdown(hasil_raw)
+                st.markdown("### 📋 Hasil AI")
+                st.markdown(hasil_raw)
 
                 df = markdown_to_df(hasil_raw)
                 if df is not None and not df.empty:
-                    #st.markdown("### 📊 Tabel Terstruktur")
-                    #st.dataframe(df, use_container_width=True)
+                    st.markdown("### 📊 Tabel Terstruktur")
+                    st.dataframe(df, use_container_width=True)
 
                     st.markdown("### 📋 Copy ke Excel (Tab Separated)")
                     # Tab separated lebih mudah di paste langsung ke Excel
