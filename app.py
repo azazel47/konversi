@@ -12,31 +12,28 @@ st.set_page_config(page_title="Konversi Koordinat AI", layout="wide")
 genai.configure(api_key="AIzaSyAI2CXCmxwKqHcT2HpRJ_vWbue_iKEZ8Yw")
 
 # ================= GEMINI =================
+def get_available_model():
+    # Mencari model yang tersedia secara dinamis
+    try:
+        models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
+        # Cari flash dulu, lalu pro
+        for m_name in models:
+            if 'gemini-1.5-flash' in m_name:
+                return m_name
+        for m_name in models:
+            if 'gemini-1.5-pro' in m_name:
+                return m_name
+        return models[0] if models else None
+    except:
+        return 'models/gemini-1.5-flash' # Fallback manual
+        
 def process_coordinates(image_input):
-    # Daftar model yang akan dicoba urut dari yang paling efisien
-    model_names = [
-        'gemini-1.5-flash', 
-        'models/gemini-1.5-flash', 
-        'gemini-1.5-pro',
-        'models/gemini-1.5-flash-latest'
-    ]
+    model_name = get_available_model()
     
-    model = None
-    last_error = ""
-
-    for name in model_names:
-        try:
-            model = genai.GenerativeModel(name)
-            # Tes singkat apakah model bisa merespon
-            test_response = model.generate_content("test", generation_config={"max_output_tokens": 1})
-            if test_response:
-                break
-        except Exception as e:
-            last_error = str(e)
-            continue
-    
-    if model is None:
-        raise Exception(f"Semua model gagal dimuat. Error terakhir: {last_error}")
+    if not model_name:
+        raise Exception("Tidak ada model Gemini yang ditemukan pada API Key ini.")
+        
+    model = genai.GenerativeModel(model_name)
 
     prompt = """
     Anda adalah sistem ekstraksi data koordinat dari tabel.
