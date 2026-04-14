@@ -4,12 +4,14 @@ import re
 from PIL import Image
 import pytesseract
 
-st.title("Konversi Koordinat (Paste Gambar / Teks)")
+st.set_page_config(page_title="Konversi Koordinat", layout="wide")
 
-st.write("### Pilih metode input:")
-mode = st.radio("Metode Input", ["Paste Gambar", "Paste Teks"])
+st.title("📍 Konversi Koordinat dari Gambar / Teks")
 
-# ================= OCR PARSER =================
+# ================= PILIH INPUT =================
+mode = st.radio("Metode Input:", ["Paste Gambar", "Paste Teks"])
+
+# ================= FUNGSI PARSER =================
 def parse_dms(text):
     pattern = re.compile(r"(\d+)[°\s]+(\d+)[']+(\d+(?:\.\d+)?)[\"]?\s*([NS])\s*(\d+)[°\s]+(\d+)[']+(\d+(?:\.\d+)?)[\"]?\s*([EW])")
     results = []
@@ -45,39 +47,41 @@ def parse_decimal(text):
 text = ""
 
 if mode == "Paste Gambar":
-    st.info("Paste gambar langsung (Ctrl+V) ke area uploader di bawah ini")
-    uploaded_file = st.file_uploader("Paste / drag gambar di sini", type=["png","jpg","jpeg"])
+    st.info("📋 Paste gambar langsung dengan Ctrl+V atau drag ke bawah")
+    uploaded_file = st.file_uploader("Paste / drag gambar", type=["png", "jpg", "jpeg"])
 
     if uploaded_file:
         image = Image.open(uploaded_file)
-        st.image(image, caption="Gambar", use_column_width=True)
+        st.image(image, caption="Gambar", use_container_width=True)
+
         text = pytesseract.image_to_string(image)
-        st.subheader("Hasil OCR:")
-        st.text(text)
+
+        with st.expander("🔍 Hasil OCR"):
+            st.text(text)
 
 elif mode == "Paste Teks":
-    text = st.text_area("Paste teks koordinat di sini")
+    text = st.text_area("Paste teks koordinat di sini:")
 
-# ================= PROCESS =================
+# ================= PROSES =================
 if text:
     df_dms = parse_dms(text)
     df_decimal = parse_decimal(text)
 
     if not df_dms.empty:
-        st.subheader("Format DMS Terdeteksi")
-        st.dataframe(df_dms)
+        st.success("✅ Format DMS terdeteksi")
+        st.dataframe(df_dms, use_container_width=True)
 
-        st.write("### Copy Tabel:")
-        st.code(df_dms.to_csv(sep='\t', index=False))
+        st.markdown("### 📋 Copy ke Excel")
+        st.code(df_dms.to_csv(sep="\t", index=False))
 
     elif not df_decimal.empty:
-        st.subheader("Format Decimal Degree Terdeteksi")
-        st.dataframe(df_decimal)
+        st.success("✅ Format Decimal Degree terdeteksi")
+        st.dataframe(df_decimal, use_container_width=True)
 
-        st.write("### Copy Tabel:")
-        st.code(df_decimal.to_csv(sep='\t', index=False))
+        st.markdown("### 📋 Copy ke Excel")
+        st.code(df_decimal.to_csv(sep="\t", index=False))
 
     else:
-        st.warning("Format koordinat tidak dikenali")
+        st.error("❌ Format koordinat tidak dikenali")
 
-st.info("Gunakan paste gambar (Ctrl+V) atau paste teks. Hasil tabel bisa langsung di-copy ke Excel.")
+st.caption("Tips: gunakan gambar yang jelas agar OCR lebih akurat")
