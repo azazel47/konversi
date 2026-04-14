@@ -13,8 +13,12 @@ genai.configure(api_key="AIzaSyAI2CXCmxwKqHcT2HpRJ_vWbue_iKEZ8Yw")
 
 # ================= GEMINI =================
 def process_coordinates(image_input):
-    # Menggunakan flash karena lebih cepat dan handal untuk OCR tabel
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    # Tambahkan awalan 'models/' untuk memastikan API mengenalinya
+    try:
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
+    except:
+        # Fallback ke pro jika flash tetap tidak ditemukan
+        model = genai.GenerativeModel('models/gemini-1.5-pro')
 
     prompt = """
     Anda adalah sistem ekstraksi data koordinat dari tabel.
