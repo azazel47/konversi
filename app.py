@@ -1,5 +1,5 @@
 import streamlit as st
-from groq import Groq
+from openai import OpenAI
 from PIL import Image
 import pandas as pd
 from streamlit_paste_button import paste_image_button
@@ -7,28 +7,30 @@ import base64
 import io
 
 # ================= CONFIG =================
-st.set_page_config(page_title="Konversi Koordinat (Groq AI)", layout="wide")
+st.set_page_config(page_title="Konversi Koordinat (OpenAI)", layout="wide")
 
-# 🔑 API KEY GROQ (Dapatkan gratis di https://console.groq.com/keys)
-# Jika dideploy ke Streamlit Cloud, gunakan st.secrets["GROQ_API_KEY"]
-GROQ_API_KEY = "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"
+# 🔑 API KEY OPENAI
+# Dapatkan di https://platform.openai.com/api-keys
+# Disarankan menggunakan st.secrets["OPENAI_API_KEY"] untuk deploy
+OPENAI_API_KEY = "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"
 
-client = Groq(api_key=GROQ_API_KEY)
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 # ================= FUNCTIONS =================
 def encode_image(image):
-    """Konversi gambar PIL ke base64 untuk dikirim ke Groq"""
+    """Konversi gambar PIL ke base64 untuk dikirim ke OpenAI"""
     buffered = io.BytesIO()
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-def process_coordinates_groq(image_input):
+def process_coordinates_openai(image_input):
     base64_image = encode_image(image_input)
     
-    # Menggunakan Llama 3.2 Vision 11B (Gratis & Cepat di Groq)
+    # Menggunakan gpt-4o-mini (sangat cepat, akurat, dan murah untuk OCR)
+    # Anda juga bisa menggunakan "gpt-4o" untuk hasil yang lebih presisi
     try:
-        completion = client.chat.completions.create(
-            model="llama-3.1-8b-instant", 
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
             messages=[
                 {
                     "role": "user",
@@ -40,7 +42,7 @@ def process_coordinates_groq(image_input):
                             Aturan:
                             1. Gunakan titik (.) untuk desimal.
                             2. Mata angin gunakan BT/BB/LU/LS.
-                            3. Hanya berikan tabel Markdown tanpa penjelasan tambahan."""
+                            3. HANYA berikan tabel Markdown saja tanpa penjelasan."""
                         },
                         {
                             "type": "image_url",
@@ -51,40 +53,42 @@ def process_coordinates_groq(image_input):
                     ]
                 }
             ],
-            temperature=0, # Set 0 agar ekstraksi lebih konsisten/kaku
-            max_tokens=1024,
+            max_tokens=2000,
+            temperature=0
         )
-        return completion.choices[0].message.content
+        return response.choices[0].message.content
     except Exception as e:
         raise e
 
 def markdown_to_df(md_text):
     """Konversi teks Markdown dari AI menjadi Pandas DataFrame"""
     try:
-        # Ambil baris yang berisi karakter tabel '|'
+        # Bersihkan baris yang tidak mengandung karakter tabel
         lines = [l.strip() for l in md_text.strip().split("\n") if "|" in l]
         
-        # Cari header (biasanya baris pertama yang mengandung kata kunci)
+        # Cari baris yang mengandung kata kunci header
         start_idx = 0
         for i, line in enumerate(lines):
             if "bujur" in line.lower() or "id" in line.lower():
                 start_idx = i
                 break
         
-        # Buang garis pemisah tabel (---)
+        # Filter garis pemisah tabel (---)
         data_lines = [l for l in lines[start_idx:] if "---" not in l]
         
-        # Pecah baris menjadi list data
+        # Pecah baris menjadi list data (menghilangkan elemen kosong di awal/akhir)
         data = [line.split("|")[1:-1] for line in data_lines]
 
-        # Buat DataFrame (Baris 0 sebagai header, sisanya data)
+        if len(data) < 2: return None
+        
+        # Buat DataFrame
         df = pd.DataFrame(data[1:], columns=[c.strip() for c in data[0]])
         return df
     except:
         return None
 
 # ================= UI =================
-st.title("📋 Paste Koordinat → Excel (Groq Vision)")
+st.title("📋 Paste Koordinat → Excel (OpenAI Vision)")
 
 col1, col2 = st.columns(2)
 
@@ -106,32 +110,24 @@ if image_to_process:
         st.image(image_to_process, use_container_width=True)
 
     if st.button("🚀 Proses ke Excel", use_container_width=True):
-        with st.spinner("Groq sedang menganalisis koordinat..."):
+        with st.spinner("OpenAI sedang membaca data..."):
             try:
-                # 1. Jalankan AI
-                hasil_raw = process_coordinates_groq(image_to_process)
-                
-                # 2. Konversi ke DataFrame
+                hasil_raw = process_coordinates_openai(image_to_process)
                 df = markdown_to_df(hasil_raw)
                 
                 if df is not None and not df.empty:
                     st.success("Berhasil diekstrak!")
                     
-                    # 3. Output akhir (Hanya kotak kode untuk copy ke Excel)
+                    # Output akhir dalam format kode TSV (Tab Separated)
                     st.markdown("### 📋 Hasil Konversi (Siap Paste ke Excel)")
-                    st.info("Klik tombol copy di pojok kanan atas kotak di bawah, lalu paste di Excel.")
+                    st.info("Klik tombol copy di pojok kanan atas, lalu paste langsung di Excel.")
                     
-                    # Konversi ke Tab Separated agar pas dipaste ke Excel
                     tsv_data = df.to_csv(sep="\t", index=False)
                     st.code(tsv_data, language="text")
                 else:
-                    st.error("Gagal mengubah hasil AI menjadi tabel. Coba ulangi proses.")
-                    # Jika gagal, tampilkan raw output untuk debug
-                    with st.expander("Lihat Jawaban AI"):
+                    st.error("AI tidak mengembalikan format tabel yang valid.")
+                    with st.expander("Lihat Respon Mentah AI"):
                         st.text(hasil_raw)
                         
             except Exception as e:
-                if "429" in str(e):
-                    st.error("⚠️ Kuota Groq Terlampaui. Tunggu 1 menit lalu coba lagi.")
-                else:
-                    st.error(f"Terjadi kesalahan: {str(e)}")
+                st.error(f"Terjadi kesalahan: {str(e)}")
