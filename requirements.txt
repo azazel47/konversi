@@ -1,5 +1,5 @@
 streamlit
-google-generativeai
-pillow
+google-generativeai>=0.5.0
+Pillow
 pandas
 streamlit-paste-button
