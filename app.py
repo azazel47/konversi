@@ -43,7 +43,7 @@ def process_coordinates(image_input):
     1. Output HARUS tabel Markdown saja
     2. Kolom: id | bujur_derajat | bujur_menit | bujur_detik | BT_BB | lintang_derajat | lintang_menit | lintang_detik | LU_LS
     3. Jangan beri penjelasan apapun di luar tabel
-    4. Gunakan titik (.) sebagai pemisah desimal
+    4. Gunakan koma (,) sebagai pemisah desimal
     5. BT_BB hanya: BT atau BB. LU_LS hanya: LU atau LS.
     """
 
@@ -97,14 +97,14 @@ if image_to_process:
     if st.button("🚀 Proses dengan AI", use_container_width=True):
         with st.spinner("🤖 AI sedang membaca tabel..."):
             try:
-                hasil_raw = process_coordinates(image_to_process)
-                st.markdown("### 📋 Hasil AI")
-                st.markdown(hasil_raw)
+                #hasil_raw = process_coordinates(image_to_process)
+                #st.markdown("### 📋 Hasil AI")
+                #st.markdown(hasil_raw)
 
                 df = markdown_to_df(hasil_raw)
                 if df is not None and not df.empty:
-                    st.markdown("### 📊 Tabel Terstruktur")
-                    st.dataframe(df, use_container_width=True)
+                    #st.markdown("### 📊 Tabel Terstruktur")
+                    #st.dataframe(df, use_container_width=True)
 
                     st.markdown("### 📋 Copy ke Excel (Tab Separated)")
                     # Tab separated lebih mudah di paste langsung ke Excel
