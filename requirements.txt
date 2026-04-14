@@ -2,3 +2,5 @@ streamlit
 pytesseract
 pillow
 pandas
+opencv-python-headless
+streamlit-paste-button
