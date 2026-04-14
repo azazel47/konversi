@@ -12,7 +12,7 @@ genai.configure(api_key="AIzaSyAI2CXCmxwKqHcT2HpRJ_vWbue_iKEZ8Yw")
 
 # ================= GEMINI =================
 def process_coordinates(image):
-    model = genai.GenerativeModel('gemini-1.5-pro')
+    model = genai.GenerativeModel('gemini-1.5-flash')
 
     prompt = """
     Anda adalah sistem ekstraksi data koordinat dari tabel.
